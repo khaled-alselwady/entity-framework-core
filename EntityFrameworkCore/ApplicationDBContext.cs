@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace EntityFrameworkCore
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
         private static IConfigurationRoot? _configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         public static string? ConnectionString = _configuration.GetSection("ConnectionString").Value;
@@ -64,9 +64,23 @@ namespace EntityFrameworkCore
             modelBuilder.Entity<Blog>()
                 .Property(p => p.Rating)
                 .HasDefaultValue(2);
+
+            modelBuilder.Entity<Blog>()
+                .Property(p => p.AddedOn)
+                .HasDefaultValueSql("GetDate()");
+
+            modelBuilder.Entity<Author>()
+                .Property(p => p.DisplayName)
+                .HasComputedColumnSql("[LastName] + ', ' + [FirstName]");
+
+            modelBuilder.Entity<Category>()
+                .Property(p => p.Id)
+                .ValueGeneratedOnAdd();
         }
 
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }
