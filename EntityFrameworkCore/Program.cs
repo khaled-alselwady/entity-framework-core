@@ -1,5 +1,4 @@
 ﻿using EntityFrameworkCore;
-using EntityFrameworkCore.Models;
 
 internal class Program
 {
@@ -7,13 +6,9 @@ internal class Program
     {
         using (var context = new ApplicationDbContext())
         {
-            Category category = new Category
-            {
-                Name = "Test"
-            };
-            context.Categories.Add(category);
 
-            context.SaveChanges();
+
+
         }
     }
 }
