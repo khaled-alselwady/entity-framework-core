@@ -16,11 +16,19 @@ namespace EntityFrameworkCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder
-                 .Entity<Blog>()
-                 .HasOne(p => p.BlogImage)
-                 .WithOne(p => p.Blog)
-                 .HasForeignKey<BlogImage>(p => p.BlogId);
+            //modelBuilder.Entity<Blog>()
+            //    .HasMany(p => p.Posts)
+            //    .WithOne()
+            //    .HasForeignKey(p => p.BlogId);
+
+            //modelBuilder.Entity<Post>()
+            //    .HasOne(p => p.Blog)
+            //    .WithMany(p => p.Posts);
+
+            modelBuilder.Entity<Post>()
+                .HasOne<Blog>()
+                .WithMany()
+                .HasForeignKey(p => p.BlogId);
         }
 
         public DbSet<Blog> Blogs { get; set; }

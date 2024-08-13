@@ -10,6 +10,7 @@ namespace EntityFrameworkCore.Models
         [Required, MaxLength(200)]
         public string? Url { get; set; }
 
-        public BlogImage BlogImage { get; set; }
+        // public List<Post> Posts { get; set; }
+
     }
 }
