@@ -7,31 +7,37 @@ namespace EntityFrameworkCore
     public class ApplicationDbContext : DbContext
     {
         private static IConfigurationRoot? _configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-        public static string? ConnectionString = _configuration.GetSection("ConnectionString").Value;
-
+        private static string? ConnectionString = _configuration.GetSection("ConnectionString").Value;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+
             optionsBuilder.UseSqlServer(ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Blog>()
-            //    .HasMany(p => p.Posts)
-            //    .WithOne()
-            //    .HasForeignKey(p => p.BlogId);
-
-            //modelBuilder.Entity<Post>()
-            //    .HasOne(p => p.Blog)
-            //    .WithMany(p => p.Posts);
-
             modelBuilder.Entity<Post>()
-                .HasOne<Blog>()
-                .WithMany()
-                .HasForeignKey(p => p.BlogId);
+                .HasMany(p => p.Tags)
+                .WithMany(p => p.Posts)
+                .UsingEntity<PostTag>(
+                    j => j
+                         .HasOne(pt => pt.Tags)
+                         .WithMany(t => t.PostTags)
+                         .HasForeignKey(pt => pt.TagId),
+                    j => j
+                         .HasOne(pt => pt.Posts)
+                         .WithMany(p => p.PostTags)
+                         .HasForeignKey(pt => pt.PostId),
+                    j =>
+                    {
+                        j.Property(pt => pt.CreateAt).HasDefaultValue("GetDate()");
+                        j.HasKey(t => t.PostTagId);
+                    }
+                );
         }
 
-        public DbSet<Blog> Blogs { get; set; }
-
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<PostTag> PostTags { get; set; }
     }
 }
