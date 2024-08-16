@@ -31,7 +31,7 @@ namespace EntityFrameworkCore
                     j =>
                     {
                         j.Property(pt => pt.CreateAt).HasDefaultValue("GetDate()");
-                        j.HasKey(t => t.PostTagId);
+                        j.HasKey(t => new { t.PostId, t.TagId });
                     }
                 );
         }
