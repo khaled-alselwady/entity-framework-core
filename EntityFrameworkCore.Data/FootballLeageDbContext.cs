@@ -14,7 +14,17 @@ namespace EntityFrameworkCore.Data
             IConfigurationRoot? _configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             string? ConnectionString = _configuration.GetSection("ConnectionString").Value;
 
-            optionsBuilder.UseSqlServer(ConnectionString);
+            optionsBuilder.UseSqlServer(ConnectionString)
+            .LogTo(log =>
+            {
+                // Filter out logs that contain the SQL command text
+                if (log.Contains("Executed DbCommand"))
+                {
+                    var sqlQuery = log.Substring(log.IndexOf("SELECT"));
+                    Console.WriteLine(sqlQuery);
+                    Console.WriteLine();
+                }
+            });
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
