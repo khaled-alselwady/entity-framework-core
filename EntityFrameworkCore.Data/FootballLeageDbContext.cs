@@ -20,9 +20,35 @@ namespace EntityFrameworkCore.Data
                 // Filter out logs that contain the SQL command text
                 if (log.Contains("Executed DbCommand"))
                 {
-                    var sqlQuery = log.Substring(log.IndexOf("SELECT"));
-                    Console.WriteLine(sqlQuery);
-                    Console.WriteLine();
+                    // Handle INSERT commands with sensitive data
+                    if (log.Contains("INSERT"))
+                    {
+                        var insertSql = log.Substring(log.IndexOf("INSERT"));
+                        Console.WriteLine(insertSql);
+                        Console.WriteLine();
+                    }
+                    // Handle UPDATE commands with sensitive data
+                    else if (log.Contains("UPDATE"))
+                    {
+                        var updateSql = log.Substring(log.IndexOf("UPDATE"));
+                        Console.WriteLine(updateSql);
+                        Console.WriteLine();
+                    }
+                    // Handle DELETE commands with sensitive data
+                    else if (log.Contains("DELETE"))
+                    {
+                        var deleteSql = log.Substring(log.IndexOf("DELETE"));
+                        Console.WriteLine(deleteSql);
+                        Console.WriteLine();
+                    }
+                    // Handle SELECT commands without sensitive data
+                    else if (log.Contains("SELECT"))
+                    {
+                        var selectSql = log.Substring(log.IndexOf("SELECT"));
+                        Console.WriteLine(selectSql);
+                        Console.WriteLine();
+                    }
+
                 }
             });
         }
