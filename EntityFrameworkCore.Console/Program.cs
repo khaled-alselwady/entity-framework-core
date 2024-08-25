@@ -182,7 +182,7 @@ async Task ListVsQueryable()
     teamsAsList = await context.Teams.ToListAsync();
     if (option == 1)
     {
-        teamsAsList = teamsAsList.Where(q => q.TeamId == 1).ToList();
+        teamsAsList = teamsAsList.Where(q => q.Id == 1).ToList();
     }
     else if (option == 2)
     {
@@ -198,7 +198,7 @@ async Task ListVsQueryable()
     var teamsAsQueryable = context.Teams.AsQueryable();
     if (option == 1)
     {
-        teamsAsQueryable = teamsAsQueryable.Where(team => team.TeamId == 1);
+        teamsAsQueryable = teamsAsQueryable.Where(team => team.Id == 1);
     }
 
     if (option == 2)
@@ -230,12 +230,12 @@ async Task NoTracking()
 async Task ProjectionsAndSelect()
 {
     var teams = await context.Teams
-        .Select(q => new TeamInfo { Name = q.Name, TeamId = q.TeamId })
+        .Select(q => new TeamInfo { Name = q.Name, Id = q.Id })
         .ToListAsync();
 
     foreach (var team in teams)
     {
-        Console.WriteLine($"{team.TeamId} - {team.Name}");
+        Console.WriteLine($"{team.Id} - {team.Name}");
     }
 }
 
@@ -277,7 +277,7 @@ void GroupByMethod()
     foreach (var group in groupedTeams)
     {
         Console.WriteLine(group.Key);
-        Console.WriteLine(group.Sum(q => q.TeamId));
+        Console.WriteLine(group.Sum(q => q.Id));
 
         foreach (var team in group)
         {
@@ -308,17 +308,17 @@ async Task OrderByMethods()
 
     // Getting the record with a maximum value
     var maxByDescendingOrder = await context.Teams
-        .OrderByDescending(q => q.TeamId)
+        .OrderByDescending(q => q.Id)
         .FirstOrDefaultAsync();
 
-    var maxBy = context.Teams.MaxBy(q => q.TeamId);
+    var maxBy = context.Teams.MaxBy(q => q.Id);
 
     // Getting the record with a minimum value
     var minByDescendingOrder = await context.Teams
-        .OrderBy(q => q.TeamId)
+        .OrderBy(q => q.Id)
         .FirstOrDefaultAsync();
 
-    var minBy = context.Teams.MinBy(q => q.TeamId);
+    var minBy = context.Teams.MinBy(q => q.Id);
 
 }
 
@@ -328,17 +328,17 @@ async Task AggregateMethods()
     var numberOfTeams = await context.Teams.CountAsync();
     Console.WriteLine($"Number of Teams: {numberOfTeams}");
 
-    var numberOfTeamsWithCondition = await context.Teams.CountAsync(q => q.TeamId == 1);
+    var numberOfTeamsWithCondition = await context.Teams.CountAsync(q => q.Id == 1);
     Console.WriteLine($"Number of Teams with condition above: {numberOfTeamsWithCondition}");
 
     // Max
-    var maxTeams = await context.Teams.MaxAsync(q => q.TeamId);
+    var maxTeams = await context.Teams.MaxAsync(q => q.Id);
     // Min
-    var minTeams = await context.Teams.MinAsync(q => q.TeamId);
+    var minTeams = await context.Teams.MinAsync(q => q.Id);
     // Average
-    var avgTeams = await context.Teams.AverageAsync(q => q.TeamId);
+    var avgTeams = await context.Teams.AverageAsync(q => q.Id);
     // Sum
-    var sumTeams = await context.Teams.SumAsync(q => q.TeamId);
+    var sumTeams = await context.Teams.SumAsync(q => q.Id);
 
 
 }
@@ -393,12 +393,12 @@ async Task GetOneTeam()
     }
 
     //Selecting a single record -First one in the list that meets a condition
-    var teamFirstWithCondition = await context.Teams.FirstAsync(team => team.TeamId == 1);
+    var teamFirstWithCondition = await context.Teams.FirstAsync(team => team.Id == 1);
     if (teamFirstWithCondition != null)
     {
         Console.WriteLine(teamFirstWithCondition.Name);
     }
-    var teamFirstOrDefaultWithCondition = await context.Teams.FirstOrDefaultAsync(team => team.TeamId == 1);
+    var teamFirstOrDefaultWithCondition = await context.Teams.FirstOrDefaultAsync(team => team.Id == 1);
     if (teamFirstOrDefaultWithCondition != null)
     {
         Console.WriteLine(teamFirstOrDefaultWithCondition.Name);
@@ -410,12 +410,12 @@ async Task GetOneTeam()
     {
         Console.WriteLine(teamSingle.Name);
     }
-    var teamSingleWithCondition = await context.Teams.SingleAsync(team => team.TeamId == 2);
+    var teamSingleWithCondition = await context.Teams.SingleAsync(team => team.Id == 2);
     if (teamSingleWithCondition != null)
     {
         Console.WriteLine(teamSingleWithCondition.Name);
     }
-    var SingleOrDefault = await context.Teams.SingleOrDefaultAsync(team => team.TeamId == 2);
+    var SingleOrDefault = await context.Teams.SingleOrDefaultAsync(team => team.Id == 2);
     if (SingleOrDefault != null)
     {
         Console.WriteLine(SingleOrDefault.Name);
@@ -447,6 +447,6 @@ async Task GetAllTeamsQuerySyntax()
 
 internal class TeamInfo
 {
-    public int TeamId { get; set; }
+    public int Id { get; set; }
     public string Name { get; set; }
 }

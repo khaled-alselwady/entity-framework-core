@@ -1,6 +1,7 @@
 ﻿using EntityFrameworkCore.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Reflection;
 
 namespace EntityFrameworkCore.Data
 {
@@ -57,27 +58,7 @@ namespace EntityFrameworkCore.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Team>().HasData(
-                    new Team
-                    {
-                        TeamId = 1,
-                        Name = "Tivoli Gardens F.C.",
-                        CreatedDate = DateTimeOffset.UtcNow.DateTime
-                    },
-                    new Team
-                    {
-                        TeamId = 2,
-                        Name = "Waterhouse F.C.",
-                        CreatedDate = DateTimeOffset.UtcNow.DateTime
-                    },
-                    new Team
-                    {
-                        TeamId = 3,
-                        Name = "Humble Lions F.C.",
-                        CreatedDate = DateTimeOffset.UtcNow.DateTime
-                    }
-
-                );
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

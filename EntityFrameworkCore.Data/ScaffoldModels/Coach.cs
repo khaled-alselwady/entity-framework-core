@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace EntityFrameworkCore.Data.ScaffoldModels;
+﻿namespace EntityFrameworkCore.Data.ScaffoldModels;
 
 public partial class Coach
 {

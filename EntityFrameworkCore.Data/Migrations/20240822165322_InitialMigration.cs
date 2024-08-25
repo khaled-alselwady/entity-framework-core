@@ -31,19 +31,19 @@ namespace EntityFrameworkCore.Data.Migrations
                 name: "Teams",
                 columns: table => new
                 {
-                    TeamId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Teams", x => x.TeamId);
+                    table.PrimaryKey("PK_Teams", x => x.Id);
                 });
 
             migrationBuilder.InsertData(
                 table: "Teams",
-                columns: new[] { "TeamId", "CreatedDate", "Name" },
+                columns: new[] { "Id", "CreatedDate", "Name" },
                 values: new object[,]
                 {
                     { 1, new DateTime(2024, 8, 22, 16, 53, 22, 581, DateTimeKind.Unspecified).AddTicks(6308), "Tivoli Gardens F.C." },

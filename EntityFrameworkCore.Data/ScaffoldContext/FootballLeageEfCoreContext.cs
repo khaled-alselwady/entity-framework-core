@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using EntityFrameworkCore.Data.ScaffoldModels;
+﻿using EntityFrameworkCore.Data.ScaffoldModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkCore.Data.ScaffoldContext;
@@ -80,15 +78,15 @@ public partial class FootballLeageEfCoreContext : DbContext
         modelBuilder.Entity<Team>(entity =>
         {
             entity.ToTable(tb => tb.IsTemporal(ttb =>
-                    {
-                        ttb.UseHistoryTable("TeamsHistory", "dbo");
-                        ttb
-                            .HasPeriodStart("PeriodStart")
-                            .HasColumnName("PeriodStart");
-                        ttb
-                            .HasPeriodEnd("PeriodEnd")
-                            .HasColumnName("PeriodEnd");
-                    }));
+            {
+                ttb.UseHistoryTable("TeamsHistory", "dbo");
+                ttb
+                    .HasPeriodStart("PeriodStart")
+                    .HasColumnName("PeriodStart");
+                ttb
+                    .HasPeriodEnd("PeriodEnd")
+                    .HasColumnName("PeriodEnd");
+            }));
 
             entity.HasIndex(e => e.LeagueId, "IX_Teams_LeagueId");
 

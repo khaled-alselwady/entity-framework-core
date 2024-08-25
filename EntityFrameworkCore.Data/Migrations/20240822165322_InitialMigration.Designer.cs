@@ -47,11 +47,11 @@ namespace EntityFrameworkCore.Data.Migrations
 
             modelBuilder.Entity("EntityFrameworkCore.Domain.Team", b =>
                 {
-                    b.Property<int>("TeamId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TeamId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -59,26 +59,26 @@ namespace EntityFrameworkCore.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("TeamId");
+                    b.HasKey("Id");
 
                     b.ToTable("Teams");
 
                     b.HasData(
                         new
                         {
-                            TeamId = 1,
+                            Id = 1,
                             CreatedDate = new DateTime(2024, 8, 22, 16, 53, 22, 581, DateTimeKind.Unspecified).AddTicks(6308),
                             Name = "Tivoli Gardens F.C."
                         },
                         new
                         {
-                            TeamId = 2,
+                            Id = 2,
                             CreatedDate = new DateTime(2024, 8, 22, 16, 53, 22, 581, DateTimeKind.Unspecified).AddTicks(6313),
                             Name = "Waterhouse F.C."
                         },
                         new
                         {
-                            TeamId = 3,
+                            Id = 3,
                             CreatedDate = new DateTime(2024, 8, 22, 16, 53, 22, 581, DateTimeKind.Unspecified).AddTicks(6315),
                             Name = "Humble Lions F.C."
                         });
