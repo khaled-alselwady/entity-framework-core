@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 // First we need an instance of context
 using var context = new FootballLeageDbContext();
 
+await context.Database.MigrateAsync();
+
 #region Read Queries
 // [Select all teams]
 // await GetAllTeams();
