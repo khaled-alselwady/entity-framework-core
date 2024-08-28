@@ -4,8 +4,62 @@ using Microsoft.EntityFrameworkCore;
 
 // First we need an instance of context
 using var context = new FootballLeageDbContext();
+// await context.Database.MigrateAsync();
 
-await context.Database.MigrateAsync();
+//var matcha = new Match
+//{
+//    AwayTeamId = 1,
+//    HomeTeamId = 2,
+//    AwayTeamScore = 0,
+//    HomeTeamScore = 0,
+//    Date = new DateTime(2024, 8, 30),
+//    TicketPrice = 20
+//};
+
+//await context.Matches.AddAsync(matcha);
+//await context.SaveChangesAsync();
+
+//var match2 = new Match
+//{
+//    AwayTeamId = 0,
+//    HomeTeamId = 0,
+//    AwayTeamScore = 0,
+//    HomeTeamScore = 0,
+//    Date = new DateTime(2024, 9, 30),
+//    TicketPrice = 40
+//};
+
+//await context.Matches.AddAsync(match2);
+//await context.SaveChangesAsync();
+
+//var team = new Team
+//{
+//    Name = "New Team",
+//    Coach = new Coach
+//    {
+//        Name = "New Coach"
+//    }
+//};
+
+//await context.Teams.AddAsync(team);
+//await context.SaveChangesAsync();
+
+
+var leagues = await context.Leagues
+    .Include(l => l.Teams)
+    .ThenInclude(t => t.Coach)
+    .ToListAsync();
+
+foreach (var league in leagues)
+{
+    Console.WriteLine($"League - {league.Name}");
+
+    foreach (var team in league.Teams)
+    {
+        Console.WriteLine($"    Team - {team.Name} + Coach - {team.Coach.Name}");
+    }
+}
+
 
 #region Read Queries
 // [Select all teams]
@@ -73,6 +127,128 @@ await context.Database.MigrateAsync();
 #endregion
 
 Console.ReadKey();
+
+async Task InsertMatch()
+{
+    var match = new Match
+    {
+        AwayTeamId = 1,
+        HomeTeamId = 2,
+        HomeTeamScore = 0,
+        AwayTeamScore = 0,
+        Date = new DateTime(2023, 10, 1),
+        TicketPrice = 20,
+    };
+
+    await context.AddAsync(match);
+    await context.SaveChangesAsync();
+
+    /* Incorrect reference data  - Will give error*/
+    var match1 = new Match
+    {
+        AwayTeamId = 0,
+        HomeTeamId = 0,
+        HomeTeamScore = 0,
+        AwayTeamScore = 0,
+        Date = new DateTime(2023, 10, 1),
+        TicketPrice = 20,
+    };
+
+    await context.AddAsync(match1);
+    await context.SaveChangesAsync();
+}
+async Task InsertMoreMatches()
+{
+    var match1 = new Match
+    {
+        AwayTeamId = 2,
+        HomeTeamId = 3,
+        HomeTeamScore = 1,
+        AwayTeamScore = 0,
+        Date = new DateTime(2023, 01, 1),
+        TicketPrice = 20,
+    };
+    var match2 = new Match
+    {
+        AwayTeamId = 2,
+        HomeTeamId = 1,
+        HomeTeamScore = 1,
+        AwayTeamScore = 0,
+        Date = new DateTime(2023, 01, 1),
+        TicketPrice = 20,
+    };
+    var match3 = new Match
+    {
+        AwayTeamId = 1,
+        HomeTeamId = 3,
+        HomeTeamScore = 1,
+        AwayTeamScore = 0,
+        Date = new DateTime(2023, 01, 1),
+        TicketPrice = 20,
+    };
+    var match4 = new Match
+    {
+        AwayTeamId = 4,
+        HomeTeamId = 3,
+        HomeTeamScore = 0,
+        AwayTeamScore = 1,
+        Date = new DateTime(2023, 01, 1),
+        TicketPrice = 20,
+    };
+    await context.AddRangeAsync(match1, match2, match3, match4);
+    await context.SaveChangesAsync();
+}
+
+async Task InsertTeamWithCoach()
+{
+    var team = new Team
+    {
+        Name = "New Team",
+        Coach = new Coach
+        {
+            Name = "Johnson"
+        },
+    };
+    await context.AddAsync(team);
+    await context.SaveChangesAsync();
+}
+
+async Task InsertLeagueWithTeams()
+{
+    var league = new League
+    {
+        Name = "Serie A",
+        Teams = new List<Team>
+                {
+                    new Team
+                    {
+                        Name = "Juventus",
+                        Coach = new Coach
+                        {
+                            Name = "Juve Coach"
+                        },
+                    },
+                    new Team
+                    {
+                        Name = "AC Milan",
+                        Coach = new Coach
+                        {
+                            Name = "Milan Coach"
+                        },
+                    },
+                    new Team
+                    {
+                        Name = "AS Roma",
+                        Coach = new Coach
+                        {
+                            Name = "Roma Coach"
+                        },
+                    }
+                }
+    };
+    await context.AddAsync(league);
+    await context.SaveChangesAsync();
+}
 
 async Task ExecuteDelete()
 {
