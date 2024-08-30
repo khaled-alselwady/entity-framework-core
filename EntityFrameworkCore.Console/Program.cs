@@ -110,19 +110,39 @@ using var context = new FootballLeageDbContext();
 //    .Any(m => m.HomeTeamId == t.Id && m.HomeTeamScore > 0))
 //    .ToListAsync();
 
-var teams = await context.Teams
+var teams1 = await context.Teams
     .Include(t => t.Coach)             // Eagerly load the Coach
     .Include(t => t.HomeMatches.Where(hm => hm.HomeTeamScore > 0))       // Eagerly load the HomeMatches
     .Where(t => t.HomeMatches          // Filter teams based on the HomeMatches
         .Any(m => m.HomeTeamScore > 0)) // Equivalent to checking Matches with a HomeTeamScore > 0
     .ToListAsync();
 
-foreach (var team in teams)
+foreach (var team in teams1)
 {
     Console.WriteLine($"{team.Name} - {team.Coach.Name}");
     foreach (var match in team.HomeMatches)
     {
         Console.WriteLine($"Score - {match.HomeTeamScore}");
+    }
+}
+Console.WriteLine("\n\n\n");
+var teams = await context.Teams
+    .Select(t => new TeamDetails
+    {
+        TeamId = t.Id,
+        TeamName = t.Name,
+        CoachName = t.Coach.Name,
+        HomeMatchesScore = t.HomeMatches.Select(hm => hm.HomeTeamScore).Where(hm => hm > 0)
+    })
+    .Where(t => t.HomeMatchesScore.Any(hm => hm > 0))
+    .ToListAsync();
+
+foreach (var team in teams)
+{
+    Console.WriteLine($"{team.TeamName} - {team.CoachName}");
+    foreach (var homeMatchScore in team.HomeMatchesScore)
+    {
+        Console.WriteLine($"Score - {homeMatchScore}");
     }
 }
 
@@ -693,4 +713,12 @@ internal class TeamInfo
 {
     public int Id { get; set; }
     public string Name { get; set; }
+}
+
+internal class TeamDetails
+{
+    public required int TeamId { get; set; }
+    public required string TeamName { get; set; }
+    public required string CoachName { get; set; }
+    public required IEnumerable<int> HomeMatchesScore { get; set; } = new List<int>();
 }
