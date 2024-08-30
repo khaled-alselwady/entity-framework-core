@@ -60,42 +60,70 @@ using var context = new FootballLeageDbContext();
 //    }
 //}
 
-var league2 = await context.FindAsync<League>(1);
+//var league2 = await context.FindAsync<League>(1);
 
-if (league2!.Teams.Count == 0)
+//if (league2!.Teams.Count == 0)
+//{
+//    Console.WriteLine("Teams have not been loaded!");
+//}
+
+//await context.Entry(league2)
+//    .Collection(l => l.Teams)
+//    .LoadAsync();
+
+//if (league2.Teams.Count != 0)
+//{
+//    foreach (var team in league2.Teams)
+//    {
+//        Console.WriteLine($"{team.Name}");
+//    }
+//}
+
+//var team1 = await context.Teams.FindAsync(1);
+//if (team1 == null)
+//{
+//    return;
+//}
+//if (team1.Coach == null)
+//{
+//    Console.WriteLine("No coach loaded!\n");
+//}
+
+//await context.Entry(team1)
+//    .Reference(t => t.Coach)
+//    .LoadAsync();
+
+//if (team1.Coach != null)
+//{
+//    Console.WriteLine($"{team1.Coach.Name}");
+//}
+
+//var teams = await context.Teams
+//    .Include("Coach")
+//    .Include(t => t.HomeMatches.Where(hm => hm.HomeTeamScore > 0))
+//    .ToListAsync();
+
+//var teams = await context.Teams
+//    .Include("Coach")
+//    .Include(t => t.HomeMatches.Where(hm => hm.HomeTeamScore > 0))
+//    .Where(t => context.Matches
+//    .Any(m => m.HomeTeamId == t.Id && m.HomeTeamScore > 0))
+//    .ToListAsync();
+
+var teams = await context.Teams
+    .Include(t => t.Coach)             // Eagerly load the Coach
+    .Include(t => t.HomeMatches.Where(hm => hm.HomeTeamScore > 0))       // Eagerly load the HomeMatches
+    .Where(t => t.HomeMatches          // Filter teams based on the HomeMatches
+        .Any(m => m.HomeTeamScore > 0)) // Equivalent to checking Matches with a HomeTeamScore > 0
+    .ToListAsync();
+
+foreach (var team in teams)
 {
-    Console.WriteLine("Teams have not been loaded!");
-}
-
-await context.Entry(league2)
-    .Collection(l => l.Teams)
-    .LoadAsync();
-
-if (league2.Teams.Count != 0)
-{
-    foreach (var team in league2.Teams)
+    Console.WriteLine($"{team.Name} - {team.Coach.Name}");
+    foreach (var match in team.HomeMatches)
     {
-        Console.WriteLine($"{team.Name}");
+        Console.WriteLine($"Score - {match.HomeTeamScore}");
     }
-}
-
-var team1 = await context.Teams.FindAsync(1);
-if (team1 == null)
-{
-    return;
-}
-if (team1.Coach == null)
-{
-    Console.WriteLine("No coach loaded!\n");
-}
-
-await context.Entry(team1)
-    .Reference(t => t.Coach)
-    .LoadAsync();
-
-if (team1.Coach != null)
-{
-    Console.WriteLine($"{team1.Coach.Name}");
 }
 
 #region Read Queries
