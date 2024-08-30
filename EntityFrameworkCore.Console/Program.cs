@@ -45,21 +45,58 @@ using var context = new FootballLeageDbContext();
 //await context.SaveChangesAsync();
 
 
-var leagues = await context.Leagues
-    .Include(l => l.Teams)
-    .ThenInclude(t => t.Coach)
-    .ToListAsync();
+//var leagues = await context.Leagues
+//    .Include(l => l.Teams)
+//    .ThenInclude(t => t.Coach)
+//    .ToListAsync();
 
-foreach (var league in leagues)
+//foreach (var league in leagues)
+//{
+//    Console.WriteLine($"League - {league.Name}");
+
+//    foreach (var team in league.Teams)
+//    {
+//        Console.WriteLine($"    Team - {team.Name} + Coach - {team.Coach.Name}");
+//    }
+//}
+
+var league2 = await context.FindAsync<League>(1);
+
+if (league2!.Teams.Count == 0)
 {
-    Console.WriteLine($"League - {league.Name}");
+    Console.WriteLine("Teams have not been loaded!");
+}
 
-    foreach (var team in league.Teams)
+await context.Entry(league2)
+    .Collection(l => l.Teams)
+    .LoadAsync();
+
+if (league2.Teams.Count != 0)
+{
+    foreach (var team in league2.Teams)
     {
-        Console.WriteLine($"    Team - {team.Name} + Coach - {team.Coach.Name}");
+        Console.WriteLine($"{team.Name}");
     }
 }
 
+var team1 = await context.Teams.FindAsync(1);
+if (team1 == null)
+{
+    return;
+}
+if (team1.Coach == null)
+{
+    Console.WriteLine("No coach loaded!\n");
+}
+
+await context.Entry(team1)
+    .Reference(t => t.Coach)
+    .LoadAsync();
+
+if (team1.Coach != null)
+{
+    Console.WriteLine($"{team1.Coach.Name}");
+}
 
 #region Read Queries
 // [Select all teams]
@@ -127,6 +164,7 @@ foreach (var league in leagues)
 #endregion
 
 Console.ReadKey();
+
 
 async Task InsertMatch()
 {
