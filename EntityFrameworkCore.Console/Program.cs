@@ -6,145 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using var context = new FootballLeageDbContext();
 // await context.Database.MigrateAsync();
 
-//var matcha = new Match
-//{
-//    AwayTeamId = 1,
-//    HomeTeamId = 2,
-//    AwayTeamScore = 0,
-//    HomeTeamScore = 0,
-//    Date = new DateTime(2024, 8, 30),
-//    TicketPrice = 20
-//};
-
-//await context.Matches.AddAsync(matcha);
-//await context.SaveChangesAsync();
-
-//var match2 = new Match
-//{
-//    AwayTeamId = 0,
-//    HomeTeamId = 0,
-//    AwayTeamScore = 0,
-//    HomeTeamScore = 0,
-//    Date = new DateTime(2024, 9, 30),
-//    TicketPrice = 40
-//};
-
-//await context.Matches.AddAsync(match2);
-//await context.SaveChangesAsync();
-
-//var team = new Team
-//{
-//    Name = "New Team",
-//    Coach = new Coach
-//    {
-//        Name = "New Coach"
-//    }
-//};
-
-//await context.Teams.AddAsync(team);
-//await context.SaveChangesAsync();
-
-
-//var leagues = await context.Leagues
-//    .Include(l => l.Teams)
-//    .ThenInclude(t => t.Coach)
-//    .ToListAsync();
-
-//foreach (var league in leagues)
-//{
-//    Console.WriteLine($"League - {league.Name}");
-
-//    foreach (var team in league.Teams)
-//    {
-//        Console.WriteLine($"    Team - {team.Name} + Coach - {team.Coach.Name}");
-//    }
-//}
-
-//var league2 = await context.FindAsync<League>(1);
-
-//if (league2!.Teams.Count == 0)
-//{
-//    Console.WriteLine("Teams have not been loaded!");
-//}
-
-//await context.Entry(league2)
-//    .Collection(l => l.Teams)
-//    .LoadAsync();
-
-//if (league2.Teams.Count != 0)
-//{
-//    foreach (var team in league2.Teams)
-//    {
-//        Console.WriteLine($"{team.Name}");
-//    }
-//}
-
-//var team1 = await context.Teams.FindAsync(1);
-//if (team1 == null)
-//{
-//    return;
-//}
-//if (team1.Coach == null)
-//{
-//    Console.WriteLine("No coach loaded!\n");
-//}
-
-//await context.Entry(team1)
-//    .Reference(t => t.Coach)
-//    .LoadAsync();
-
-//if (team1.Coach != null)
-//{
-//    Console.WriteLine($"{team1.Coach.Name}");
-//}
-
-//var teams = await context.Teams
-//    .Include("Coach")
-//    .Include(t => t.HomeMatches.Where(hm => hm.HomeTeamScore > 0))
-//    .ToListAsync();
-
-//var teams = await context.Teams
-//    .Include("Coach")
-//    .Include(t => t.HomeMatches.Where(hm => hm.HomeTeamScore > 0))
-//    .Where(t => context.Matches
-//    .Any(m => m.HomeTeamId == t.Id && m.HomeTeamScore > 0))
-//    .ToListAsync();
-
-var teams1 = await context.Teams
-    .Include(t => t.Coach)             // Eagerly load the Coach
-    .Include(t => t.HomeMatches.Where(hm => hm.HomeTeamScore > 0))       // Eagerly load the HomeMatches
-    .Where(t => t.HomeMatches          // Filter teams based on the HomeMatches
-        .Any(m => m.HomeTeamScore > 0)) // Equivalent to checking Matches with a HomeTeamScore > 0
-    .ToListAsync();
-
-foreach (var team in teams1)
-{
-    Console.WriteLine($"{team.Name} - {team.Coach.Name}");
-    foreach (var match in team.HomeMatches)
-    {
-        Console.WriteLine($"Score - {match.HomeTeamScore}");
-    }
-}
-Console.WriteLine("\n\n\n");
-var teams = await context.Teams
-    .Select(t => new TeamDetails
-    {
-        TeamId = t.Id,
-        TeamName = t.Name,
-        CoachName = t.Coach.Name,
-        HomeMatchesScore = t.HomeMatches.Select(hm => hm.HomeTeamScore).Where(hm => hm > 0)
-    })
-    .Where(t => t.HomeMatchesScore.Any(hm => hm > 0))
-    .ToListAsync();
-
-foreach (var team in teams)
-{
-    Console.WriteLine($"{team.TeamName} - {team.CoachName}");
-    foreach (var homeMatchScore in team.HomeMatchesScore)
-    {
-        Console.WriteLine($"Score - {homeMatchScore}");
-    }
-}
+#region Raw SQL
+var details = await context.TeamsAndLeaguesView.ToListAsync();
+#endregion
 
 #region Read Queries
 // [Select all teams]
@@ -211,7 +75,131 @@ foreach (var team in teams)
 
 #endregion
 
+#region Related Data
+// Insert record with FK
+//await InsertMatch();
+
+// Insert Parent/Child
+//await InsertTeamWithCoach();
+
+// Insert Parent with Children
+//await InsertLeagueWithTeams();
+
+// Eager Loading Data
+//await EagerLoadingData();
+
+// Explicit Loading Data
+//await ExplicitLoadingData();
+
+// Lazy Loading
+//await LazyLoadingData();
+
+// Filtering Includes
+// Get all teams and only home matches where they have scored
+//await FilteringIncludes();
+
+// Projects and Anonymous types
+//await AnonymousTypesAndRelatedData();
+
+#endregion
+
 Console.ReadKey();
+async Task AnonymousTypesAndRelatedData()
+{
+    var teams = await context.Teams
+    .Select(t => new TeamDetails
+    {
+        TeamId = t.Id,
+        TeamName = t.Name,
+        CoachName = t.Coach.Name,
+        HomeMatchesScore = t.HomeMatches.Select(hm => hm.HomeTeamScore).Where(hm => hm > 0)
+    })
+    .Where(t => t.HomeMatchesScore.Any(hm => hm > 0))
+    .ToListAsync();
+
+    foreach (var team in teams)
+    {
+        Console.WriteLine($"{team.TeamName} - {team.CoachName}");
+        foreach (var homeMatchScore in team.HomeMatchesScore)
+        {
+            Console.WriteLine($"Score - {homeMatchScore}");
+        }
+    }
+}
+async Task FilteringIncludes()
+{
+    //await InsertMoreMatches();
+    var teams = await context.Teams
+        .Include("Coach")
+        .Include(q => q.HomeMatches.Where(q => q.HomeTeamScore > 0))
+        .ToListAsync();
+
+    foreach (var team in teams)
+    {
+        Console.WriteLine($"{team.Name} - {team.Coach.Name}");
+        foreach (var match in team.HomeMatches)
+        {
+            Console.WriteLine($"Score - {match.HomeTeamScore}");
+        }
+    }
+}
+
+async Task ExplicitLoadingData()
+{
+    var league = await context.FindAsync<League>(1);
+    if (!league.Teams.Any())
+    {
+        Console.WriteLine("Teams have not been loaded");
+    }
+
+    await context.Entry(league)
+        .Collection(q => q.Teams)
+        .LoadAsync();
+
+    if (league.Teams.Any())
+    {
+        foreach (var team in league.Teams)
+        {
+            Console.WriteLine($"{team.Name}");
+        }
+    }
+}
+
+async Task LazyLoadingData()
+{
+    var league = await context.FindAsync<League>(1);
+    foreach (var team in league.Teams)
+    {
+        Console.WriteLine($"{team.Name}");
+    }
+
+    // Example of N+1 Problem
+    //foreach (var league in context.Leagues)
+    //{
+    //    foreach (var team in league.Teams)
+    //    {
+    //        Console.WriteLine($"{team.Name} - {team.Coach.Name}");
+    //    }
+    //}
+
+}
+async Task EagerLoadingData()
+{
+    var leagues = await context.Leagues
+        //.Include("Teams") // You can also use the name of the property
+        .Include(q => q.Teams)
+            .ThenInclude(q => q.Coach) // Use for tables realted to the related table
+        .ToListAsync();
+
+    foreach (var league in leagues)
+    {
+        Console.WriteLine($"League - {league.Name}");
+        foreach (var team in league.Teams)
+        {
+            Console.WriteLine($"{team.Name} - {team.Coach.Name}");
+        }
+    }
+}
 
 
 async Task InsertMatch()
