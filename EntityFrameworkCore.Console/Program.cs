@@ -11,6 +11,7 @@ using var context = new FootballLeageDbContext();
 //var details = await context.TeamsAndLeaguesView.ToListAsync();
 // ExecutingRawSql();
 // RawSqlWithLinq();
+// OtherRawQueries();
 
 #endregion
 
@@ -122,6 +123,10 @@ void OtherRawQueries()
 
     int matchId = 1;
     context.Database.ExecuteSqlInterpolated($"EXEC dbo.DeleteMatch {matchId}");
+
+    // Query Scalar or Non-Entity Type
+    var leagueIds = context.Database.SqlQuery<int>($"SELECT Id FROM Leagues")
+        .ToList();
 }
 
 void RawSqlWithLinq()
