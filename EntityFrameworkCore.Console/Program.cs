@@ -9,7 +9,8 @@ using var context = new FootballLeageDbContext();
 
 #region Raw SQL
 //var details = await context.TeamsAndLeaguesView.ToListAsync();
-ExecutingRawSql();
+// ExecutingRawSql();
+RawSqlWithLinq();
 
 #endregion
 
@@ -107,6 +108,20 @@ ExecutingRawSql();
 #endregion
 
 Console.ReadKey();
+
+void RawSqlWithLinq()
+{
+    var teamsList = context.Teams.FromSql($"SELECT * FROM Teams")
+    .Where(q => q.Id == 1)
+    .OrderBy(q => q.Id)
+    .Include("League")
+    .ToList();
+
+    foreach (var t in teamsList)
+    {
+        Console.WriteLine(t);
+    }
+}
 
 void ExecutingRawSql()
 {
