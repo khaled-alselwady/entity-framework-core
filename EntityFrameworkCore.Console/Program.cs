@@ -10,7 +10,7 @@ using var context = new FootballLeageDbContext();
 #region Raw SQL
 //var details = await context.TeamsAndLeaguesView.ToListAsync();
 // ExecutingRawSql();
-RawSqlWithLinq();
+// RawSqlWithLinq();
 
 #endregion
 
@@ -108,6 +108,21 @@ RawSqlWithLinq();
 #endregion
 
 Console.ReadKey();
+
+void OtherRawQueries()
+{
+    // Executing Stored Procedures
+    var leagueId = 1;
+    var league = context.Leagues
+        .FromSqlInterpolated($"EXEC dbo.StoredProcedureToGetLeagueNameHere {leagueId}");
+
+    // Non-querying statement 
+    var someName = "Random Team Name";
+    context.Database.ExecuteSqlInterpolated($"UPDATE Teams SET Name = {someName}");
+
+    int matchId = 1;
+    context.Database.ExecuteSqlInterpolated($"EXEC dbo.DeleteMatch {matchId}");
+}
 
 void RawSqlWithLinq()
 {
