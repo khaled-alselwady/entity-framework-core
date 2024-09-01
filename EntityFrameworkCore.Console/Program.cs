@@ -1,5 +1,6 @@
 ﻿using EntityFrameworkCore.Data;
 using EntityFrameworkCore.Domain;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 // First we need an instance of context
@@ -7,7 +8,9 @@ using var context = new FootballLeageDbContext();
 // await context.Database.MigrateAsync();
 
 #region Raw SQL
-var details = await context.TeamsAndLeaguesView.ToListAsync();
+//var details = await context.TeamsAndLeaguesView.ToListAsync();
+ExecutingRawSql();
+
 #endregion
 
 #region Read Queries
@@ -104,6 +107,34 @@ var details = await context.TeamsAndLeaguesView.ToListAsync();
 #endregion
 
 Console.ReadKey();
+
+void ExecutingRawSql()
+{
+    // FromSqlRaw()
+    Console.WriteLine("Enter Team Name: ");
+    var teamName = Console.ReadLine();
+    var teamNameParam = new SqlParameter("teamName", teamName);
+    var teams = context.Teams.FromSqlRaw($"SELECT * FROM Teams WHERE name = @teamName", teamNameParam);
+    foreach (var t in teams)
+    {
+        Console.WriteLine(t);
+    }
+
+    // FromSql()
+    teams = context.Teams.FromSql($"SELECT * FROM Teams WHERE name = {teamName}");
+    foreach (var t in teams)
+    {
+        Console.WriteLine(t);
+    }
+
+    // FromSqlInterpolated
+    teams = context.Teams.FromSqlInterpolated($"SELECT * FROM Teams WHERE name = {teamName}");
+    foreach (var t in teams)
+    {
+        Console.WriteLine(t);
+    }
+}
+
 async Task AnonymousTypesAndRelatedData()
 {
     var teams = await context.Teams
