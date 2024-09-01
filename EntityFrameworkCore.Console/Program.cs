@@ -127,6 +127,9 @@ void OtherRawQueries()
     // Query Scalar or Non-Entity Type
     var leagueIds = context.Database.SqlQuery<int>($"SELECT Id FROM Leagues")
         .ToList();
+
+    // Execute User-Defined Query
+    var earliestMatch = context.GetEarliestTeamMatch(1);
 }
 
 void RawSqlWithLinq()
